@@ -5,7 +5,7 @@
 #include <WiFi.h>
 #include <ESPAsyncWebServer.h>
 #include <Preferences.h>
-#include "LITTLEFS.h"
+#include "LittleFS.h"
 #include "config.h"
 #include "Message.h"
 #include "Crypto.h"
@@ -152,7 +152,7 @@ void startStaMode() {
     while (WiFi.status() != WL_CONNECTED) { delay(500); Serial.print("."); }
     Serial.println("\nWiFi Connected. IP: " + WiFi.localIP().toString());
 
-    if(!LITTLEFS.begin(true)) { Serial.println("LITTLEFS Mount Failed"); return; }
+    if(!LittleFS.begin(true)) { Serial.println("LittleFS Mount Failed"); return; }
 
     SPI.begin();
     LoRa.setPins(LORA_SS_PIN, LORA_RST_PIN, LORA_DIO0_PIN);
@@ -167,9 +167,9 @@ void startStaMode() {
     xTaskCreate(Task_LoRa_Handler, "LoRa Handler", 4096, NULL, 3, NULL);
 
     // --- Serveur Web ---
-    server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){ request->send(LITTLEFS, "/index.html", "text/html"); });
-    server.on("/style.css", HTTP_GET, [](AsyncWebServerRequest *request){ request->send(LITTLEFS, "/style.css", "text/css"); });
-    server.on("/script.js", HTTP_GET, [](AsyncWebServerRequest *request){ request->send(LITTLEFS, "/script.js", "application/javascript"); });
+    server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){ request->send(LittleFS, "/index.html", "text/html"); });
+    server.on("/style.css", HTTP_GET, [](AsyncWebServerRequest *request){ request->send(LittleFS, "/style.css", "text/css"); });
+    server.on("/script.js", HTTP_GET, [](AsyncWebServerRequest *request){ request->send(LittleFS, "/script.js", "application/javascript"); });
     server.on("/api/assign", HTTP_POST, [](AsyncWebServerRequest *request) {
         String reservoirId, wellId;
         if (request->hasParam("reservoir", true)) reservoirId = request->getParam("reservoir", true)->value();
